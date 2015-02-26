@@ -1,0 +1,50 @@
+user www-data;
+worker_processes 4;
+pid /run/nginx.pid;
+
+events {
+	worker_connections 768;
+}
+
+http {
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	keepalive_timeout 65;
+	types_hash_max_size 2048;
+        charset utf-8;
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+	gzip on;
+	gzip_comp_level 6;
+	gzip_disable "msie6";
+	gzip_proxied any;
+	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+	gzip_vary on;
+	proxy_cache_path /var/cache/nginx keys_zone=nginxcache:10m;
+	upstream helloworld {
+		server 127.0.0.1:8000;
+	}
+	server {
+    		listen 80;
+		proxy_cache_valid 200 5m;
+   		proxy_cache_key "$request_method|$http_if_modified_since|$host|$request_uri";
+   		proxy_hide_header "Set-Cookie";
+   		proxy_cache nginxcache;
+		location / {
+        		proxy_pass http://127.0.0.1:8000;
+        		proxy_set_header Host $host;
+        		proxy_set_header X-Real_IP $remote_addr;
+    		}
+		location ^~ /uploads/ {
+        		root /home/nastya/helloworld/uploads;
+        		expires 1d;
+    		}
+    		location ~ \.(js|css|jpeg|jpg|png|gif)$ {
+        		root /home/nastya/helloworld/static;
+        		#expires 7d;
+    		}
+	}
+}

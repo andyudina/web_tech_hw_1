@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+   <body>
+       <p><h1>{{ greeting }}</h1></p><br>
+       <ul><h3>Get parameters</h3>:
+       {% for param in get_params %}
+           <li>{{ param.0 }}: {{ param.1 }}</li>
+       {% endfor %}
+       </ul>
+       <ul><h3>Post parameter</h3>: 
+       {% for param in post_params %}
+           <li>{{ param.0 }}: {{ param.1 }}</li>
+       {% endfor %}
+       </ul>
+   </body>
+</html>
